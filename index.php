@@ -87,22 +87,22 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body">
-            <a href="#" class="menu-link active" data-target="dashboard">🏠 Dashboard</a>
-            <a href="#" class="menu-link" data-target="favorites">⭐ Favorites</a>
-            <a href="#" class="menu-link" data-target="trash">🗑️ Trash</a>
-            <a href="#" class="menu-link" data-target="archive">📦 Archive</a>
-            <a href="#" class="menu-link" data-target="settings">⚙️ Settings</a>
+            <a href="#" data-section="dashboard" class="active">🏠 Dashboard</a>
+            <a href="#" data-section="favorites">⭐ Favorites</a>
+            <a href="#" data-section="trash">🗑️ Trash</a>
+            <a href="#" data-section="archive">📦 Archive</a>
+            <a href="#" data-section="settings">⚙️ Settings</a>
         </div>
     </div>
 
     <!-- Sidebar for large screens -->
     <div class="sidebar d-none d-md-block">
         <h4 class="text-center">📁 Album</h4>
-        <a href="#" class="menu-link active" data-target="dashboard">🏠 Dashboard</a>
-        <a href="#" class="menu-link" data-target="favorites">⭐ Favorites</a>
-        <a href="#" class="menu-link" data-target="trash">🗑️ Trash</a>
-        <a href="#" class="menu-link" data-target="archive">📦 Archive</a>
-        <a href="#" class="menu-link" data-target="settings">⚙️ Settings</a>
+        <a href="#" data-section="dashboard" class="active">🏠 Dashboard</a>
+        <a href="#" data-section="favorites">⭐ Favorites</a>
+        <a href="#" data-section="trash">🗑️ Trash</a>
+        <a href="#" data-section="archive">📦 Archive</a>
+        <a href="#" data-section="settings">⚙️ Settings</a>
     </div>
 
     <!-- Main Content -->
@@ -187,10 +187,50 @@
             <h2>⭐ Favorites</h2>
             <p>Feature coming soon...</p>
         </div>
+
+        <div id="trash" class="content-section">
+            <h2>⭐ Trash</h2>
+            <p>Feature coming soon...</p>
+        </div>
     </div>
+
+
 
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- SIDEBAR -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const links = document.querySelectorAll(".sidebar a, .offcanvas-body a");
+            const sections = document.querySelectorAll(".content-section");
+
+            links.forEach(link => {
+                link.addEventListener("click", function(e) {
+                    e.preventDefault();
+
+                    const target = this.getAttribute("data-section");
+
+                    // Show the selected section
+                    sections.forEach(section => {
+                        section.classList.remove("active");
+                        if (section.id === target) {
+                            section.classList.add("active");
+                        }
+                    });
+
+                    // Highlight the active link in both desktop and offcanvas sidebar
+                    links.forEach(l => l.classList.remove("active"));
+                    document.querySelectorAll(`[data-section="${target}"]`).forEach(el => el.classList.add("active"));
+
+                    // Close offcanvas on small screens
+                    const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('sidebarMenu'));
+                    if (offcanvas) offcanvas.hide();
+                });
+            });
+        });
+    </script>
+
 </body>
 
 </html>

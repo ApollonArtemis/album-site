@@ -10,5 +10,5 @@ if (!empty($folder)) {
     mkdir("uploads/" . $folder);  // create folder on server
 }
 
-header("Location: index.php");
+header("Location: homepage.php");
 ?>

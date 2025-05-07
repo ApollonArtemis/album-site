@@ -5,6 +5,8 @@
 <head>
     <title>Photo Albums</title>
 
+    <link rel="shortcut icon" href="images/photoalbum.png" type="image/x-icon">
+
     <!-- BOOTSTRAP CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
 
@@ -87,11 +89,11 @@
             <!--CONTENT 1: DASHBOARD-->
             <div id="content1" class="content-item" data-title="Dashboard">
                 <div class="inner-content mt-5">
-                    <h2>My Photo Album (Dashboard)</h2>
+                    <h2 class="fw-bold">My Photo Album</h2>
 
                     <!-- Add New Album Button (visible after folder creation) -->
                     <div class="d-flex justify-content-end">
-                        <button class="btn btn-primary mb-3 d-none" id="addAlbumButton" data-bs-toggle="modal" data-bs-target="#addAlbumModal">+ Add New Album</button>
+                        <button class="btn mb-3 d-none" id="addAlbumButton" data-bs-toggle="modal" data-bs-target="#addAlbumModal">+ Add New Album</button>
                     </div>
 
                     <!-- Display Empty State if no folders are created -->
@@ -100,7 +102,7 @@
                         <h4 class="text-secondary">No Albums Here</h4>
                         <p>Click the button below to add a new album.</p>
                         <div class="blankslate-actions">
-                            <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#addAlbumModal">
+                            <button id="emptystateAddAlbumModal" class="btn" type="button" data-bs-toggle="modal" data-bs-target="#addAlbumModal">
                                 + Add New Album
                             </button>
                         </div>
@@ -173,10 +175,12 @@
             <div class="content-item" id="viewFolder" style="display: none;" data-title="View Folder">
                 <div class="inner-content mt-5">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 id="folderTitle" class="fw-semibold"></h2>
+                        <h2 id="folderTitle" class="fw-bold"></h2>
+
+                        <input type="hidden" id="uploadFolderIdDrop" value="">
 
                         <!-- Upload Image Button -->
-                        <button id="uploadImageButton" type="button" class="btn btn-success d-none" data-bs-toggle="modal" data-bs-target="#uploadImageModal">
+                        <button id="uploadImageButton" type="button" class="btn d-none" data-bs-toggle="modal" data-bs-target="#uploadImageModal">
                             <i class="fas fa-upload"></i> Upload Image
                         </button>
                     </div>
@@ -186,20 +190,18 @@
                         <button class="btn btn-primary d-none" id="uploadImageButtonAlt" data-bs-toggle="modal" data-bs-target="#uploadImageModal">+ Upload Image</button>
                     </div>
 
-                    <!-- Empty State for Folder with Drag & Drop -->
-                    <div id="folderEmptyState" class="blankslate my-5 text-center d-none">
-                        <div class="mb-3">
-                            <i class="fas fa-folder-open fa-3x text-muted"></i>
+                    <!-- Drag-and-Drop Zone -->
+                    <div id="dropZone" class="p-4 my-3">
+                        <!-- Empty State -->
+                        <div id="folderEmptyState" class="blankslate my-5 text-center d-none">
+                            <div class="mb-3">
+                                <i class="fas fa-folder-open fa-3x text-muted"></i>
+                            </div>
+                            <h3>No images in this folder yet</h3>
+                            <p class="text-muted">Start uploading to fill it up or drag and drop images here</p>
+                            <button class="btn" data-bs-toggle="modal" id="emptystate2AddAlbumModal" data-bs-target="#uploadImageModal">Upload Image</button>
                         </div>
-                        <h3>No images in this folder yet</h3>
-                        <p class="text-muted">Start uploading to fill it up or drag and drop images here</p>
-
-                        <!-- Drag-and-Drop Zone -->
-                        <div id="dropZone" class="border border-primary rounded p-4 my-3" style="cursor: pointer;">
-                            <p class="text-muted mb-0">Drag and drop images here</p>
-                        </div>
-
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadImageModal">Upload Image</button>
+                        <p class="text-muted text-center mb-0" id="dropHint">You can drag and drop images here</p>
                     </div>
 
                     <!-- Display Images -->
@@ -211,7 +213,7 @@
                                         <a href="#" data-bs-toggle="modal" data-bs-target="#imagePreviewModal" data-img-src="uploads/<?= $folder['name'] ?>/<?= $img['filename'] ?>">
                                             <img src="uploads/<?= $folder['name'] ?>/<?= $img['filename'] ?>" class="card-img-top img-thumbnail" style="object-fit: cover; width: 100%; height: 200px;" alt="Image">
                                         </a>
-                                        <div class="card-body p-2 text-center">
+                                        <div class="card-body text-center">
                                             <p class="card-text mb-0 text-truncate" title="<?= htmlspecialchars($img['filename']) ?>">
                                                 <?= htmlspecialchars($img['filename']) ?>
                                             </p>
@@ -252,7 +254,7 @@
                             <label for="folder_name" class="form-label">Album Name</label>
                             <input type="text" name="folder_name" id="folder_name" class="form-control" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Create Album</button>
+                        <button type="submit" class="btn" id="createAlbum">Create Album</button>
                     </form>
                 </div>
             </div>
@@ -276,8 +278,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Upload</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn" id="btnUploadImagesModal">Upload</button>
                     </div>
                 </form>
             </div>
@@ -297,7 +299,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button class="btn btn-primary" id="confirmUploadBtn">Upload</button>
+                    <button class="btn" id="confirmUploadBtn">Upload</button>
                 </div>
             </div>
         </div>
@@ -305,58 +307,178 @@
 
     <!--DRAG AND DROP IMAGES-->
     <script>
-        let droppedFiles = [];
+        document.addEventListener("DOMContentLoaded", () => {
+            const dropZone = document.getElementById('dropZone');
+            const imageContainer = document.getElementById('imageContainer'); // This is the container for displayed images
+            const previewContainer = document.getElementById('droppedImagePreview');
+            const uploadBtn = document.getElementById('confirmUploadBtn');
+            const dropHint = document.getElementById('dropHint'); // To show or hide the drag/drop hint
 
-        const dropZone = document.getElementById('dropZone');
-        const previewContainer = document.getElementById('droppedImagePreview');
-        const uploadBtn = document.getElementById('confirmUploadBtn');
+            let droppedFiles = [];
 
-        // Drag-and-drop events
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('bg-light');
-        });
+            // Function to handle image previews
+            function previewDroppedFiles(files) {
+                previewContainer.innerHTML = ''; // Clear any previous previews
+                droppedFiles.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.className = 'img-thumbnail';
+                        img.style.width = '150px';
+                        previewContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
 
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('bg-light');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('bg-light');
-            droppedFiles = [...e.dataTransfer.files].filter(file => file.type.startsWith('image/'));
-
-            previewContainer.innerHTML = '';
-            droppedFiles.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const img = document.createElement('img');
-                    img.src = event.target.result;
-                    img.className = 'img-thumbnail';
-                    img.style.width = '150px';
-                    previewContainer.appendChild(img);
-                };
-                reader.readAsDataURL(file);
+            // Handle dragover event
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('bg-light'); // Add visual effect for dragover
             });
 
-            const modal = new bootstrap.Modal(document.getElementById('droppedImagesModal'));
-            modal.show();
-        });
+            // Handle dragleave event
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('bg-light');
+            });
 
-        // Confirm upload
-        uploadBtn.addEventListener('click', () => {
-            const formData = new FormData();
-            droppedFiles.forEach(file => formData.append('images[]', file));
+            // Handle drop event on dropZone
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('bg-light');
+                droppedFiles = [...e.dataTransfer.files].filter(file => file.type.startsWith('image/'));
 
-            fetch('upload_image.php', {
+                // Preview the dropped files
+                previewDroppedFiles(droppedFiles);
+
+                // Show the preview modal for dropped images
+                const modal = new bootstrap.Modal(document.getElementById('droppedImagesModal'));
+                modal.show();
+            });
+
+            // Allow images in imageContainer to be dragged and dropped
+            imageContainer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                imageContainer.classList.add('bg-light');
+            });
+
+            imageContainer.addEventListener('dragleave', () => {
+                imageContainer.classList.remove('bg-light');
+            });
+
+            imageContainer.addEventListener('drop', (e) => {
+                e.preventDefault();
+                imageContainer.classList.remove('bg-light');
+                droppedFiles = [...e.dataTransfer.files].filter(file => file.type.startsWith('image/'));
+
+                // Preview the dropped files
+                previewDroppedFiles(droppedFiles);
+
+                // Show the preview modal for dropped images
+                const modal = new bootstrap.Modal(document.getElementById('droppedImagesModal'));
+                modal.show();
+            });
+
+            // Upload dropped images
+            uploadBtn.addEventListener('click', () => {
+                const formData = new FormData();
+                droppedFiles.forEach(file => formData.append('image_file[]', file));
+
+                const folderId = document.getElementById('uploadFolderIdDrop').value;
+                if (!folderId) {
+                    alert("No folder selected.");
+                    return;
+                }
+
+                formData.append('folder_id', folderId);
+
+                fetch('upload_image.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(res => res.ok ? location.reload() : alert("Upload failed."))
+                    .catch(err => console.error(err));
+            });
+
+            // Show/Hide the drop hint based on images
+            function toggleDropHint(imagesPresent) {
+                if (imagesPresent) {
+                    dropHint.classList.add('d-none'); // Hide the drag-and-drop hint
+                } else {
+                    dropHint.classList.remove('d-none'); // Show the drag-and-drop hint
+                }
+            }
+
+            // Show/Hide Empty State and Drag-and-Drop Hint After Folder Data Fetch
+            $('.open-folder').click(function(e) {
+                e.preventDefault();
+
+                const folderId = $(this).data('folder-id');
+                const folderName = $(this).data('folder-name');
+
+                $('.content-item').hide();
+                $('#viewFolder').show();
+
+                $('#folderTitle').text("Album: " + folderName);
+                $('#uploadImageModalLabel').text("Upload Image to " + folderName);
+                $('input[name="folder_id"]').val(folderId);
+                $('#uploadFolderIdDrop').val(folderId); // ✅ ADD THIS
+
+                $('#imageContainer').html('');
+                $('#uploadImageButton').addClass('d-none');
+                $('#folderEmptyState').removeClass('d-none');
+                $('#dropHint').removeClass('d-none'); // Make sure the hint is shown by default
+
+                $.ajax({
+                    url: 'fetch_images.php',
                     method: 'POST',
-                    body: formData
-                })
-                .then(res => res.ok ? location.reload() : alert("Upload failed."))
-                .catch(err => console.error(err));
+                    data: {
+                        folder_id: folderId
+                    },
+                    success: function(response) {
+                        const data = JSON.parse(response);
+                        if (data.length > 0) {
+                            // Hide Empty State & Show Images
+                            $('#folderEmptyState').addClass('d-none');
+                            $('#uploadImageButton').removeClass('d-none');
+                            $('#dropHint').addClass('d-none'); // Hide the drag/drop hint
+
+                            data.forEach(img => {
+                                $('#imageContainer').append(`
+                            <div class="col-md-3 col-sm-6 mb-4">
+                                <div class="card">
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#imagePreviewModal" data-img-src="uploads/${folderName}/${img.filename}">
+                                        <img src="uploads/${folderName}/${img.filename}" class="card-img-top img-thumbnail" style="object-fit: cover; width: 100%; height: 200px;" alt="Image">
+                                    </a>
+                                    <div class="card-body p-2 text-center">
+                                        <p class="card-text mb-0 text-truncate" title="${img.filename}">${img.filename}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                            });
+
+                            // Toggle the drop hint visibility
+                            toggleDropHint(true);
+
+                        } else {
+                            // Show Empty State if No Images
+                            $('#folderEmptyState').removeClass('d-none');
+                            $('#uploadImageButton').addClass('d-none');
+                            $('#dropHint').removeClass('d-none'); // Show the drag/drop hint again
+
+                            // Toggle the drop hint visibility
+                            toggleDropHint(false);
+                        }
+                    },
+                    error: function() {
+                        console.log('Error fetching images');
+                    }
+                });
+            });
         });
     </script>
-
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -406,42 +528,26 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 
-    <!--Show Image-->
-    <script>
-        const imagePreviewModal = document.getElementById('imagePreviewModal');
-        imagePreviewModal.addEventListener('show.bs.modal', function(event) {
-            const trigger = event.relatedTarget;
-            const imgSrc = trigger.getAttribute('data-img-src');
-            const modalImg = imagePreviewModal.querySelector('#previewImage');
-            modalImg.src = imgSrc;
-        });
-    </script>
-
     <!--Show images on Folder-->
-    <script>
+    <!-- <script>
         $('.open-folder').click(function(e) {
             e.preventDefault();
 
             const folderId = $(this).data('folder-id');
             const folderName = $(this).data('folder-name');
 
-            // Hide all content sections
             $('.content-item').hide();
-
-            // Show the view folder section
             $('#viewFolder').show();
 
-            // Update folder name in the title and modal
-            $('#viewFolder h2').text("Album: " + folderName);
+            $('#folderTitle').text("Album: " + folderName);
             $('#uploadImageModalLabel').text("Upload Image to " + folderName);
             $('input[name="folder_id"]').val(folderId);
+            $('#uploadFolderIdDrop').val(folderId); // ✅ ADD THIS
 
-            // Clear image container and show empty state initially
-            $('#imageContainer').html(''); // clear previous images
+            $('#imageContainer').html('');
             $('#uploadImageButton').addClass('d-none');
-            $('#folderEmptyState').removeClass('d-none'); // show empty state initially
+            $('#folderEmptyState').removeClass('d-none');
 
-            // Fetch images from server
             $.ajax({
                 url: 'fetch_images.php',
                 method: 'POST',
@@ -451,35 +557,45 @@
                 success: function(response) {
                     const data = JSON.parse(response);
                     if (data.length > 0) {
-                        // Hide empty state and show images
                         $('#folderEmptyState').addClass('d-none');
                         $('#uploadImageButton').removeClass('d-none');
+                        $('#dropHint').addClass('d-none'); // HIDE the drag/drop hint
 
-                        // Loop through the images and display them
                         data.forEach(img => {
                             $('#imageContainer').append(`
-                        <div class="col-md-3 col-sm-6 mb-4">
-                            <div class="card">
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#imagePreviewModal" data-img-src="uploads/${folderName}/${img.filename}">
-                                    <img src="uploads/${folderName}/${img.filename}" class="card-img-top img-thumbnail" style="object-fit: cover; width: 100%; height: 200px;" alt="Image">
-                                </a>
-                                <div class="card-body p-2 text-center">
-                                    <p class="card-text mb-0 text-truncate" title="${img.filename}">${img.filename}</p>
-                                </div>
-                            </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="card">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#imagePreviewModal" data-img-src="uploads/${folderName}/${img.filename}">
+                            <img src="uploads/${folderName}/${img.filename}" class="card-img-top img-thumbnail" style="object-fit: cover; width: 100%; height: 200px;" alt="Image">
+                        </a>
+                        <div class="card-body p-2 text-center">
+                            <p class="card-text mb-0 text-truncate" title="${img.filename}">${img.filename}</p>
                         </div>
-                    `);
+                    </div>
+                </div>
+            `);
                         });
                     } else {
-                        // If no images, show the empty state
                         $('#folderEmptyState').removeClass('d-none');
                         $('#uploadImageButton').addClass('d-none');
+                        $('#dropHint').removeClass('d-none'); // SHOW the hint again if no images
                     }
                 },
                 error: function() {
                     console.log('Error fetching images');
                 }
             });
+        });
+    </script> -->
+
+    <!--Show Image-->
+    <script>
+        const imagePreviewModal = document.getElementById('imagePreviewModal');
+        imagePreviewModal.addEventListener('show.bs.modal', function(event) {
+            const trigger = event.relatedTarget;
+            const imgSrc = trigger.getAttribute('data-img-src');
+            const modalImg = imagePreviewModal.querySelector('#previewImage');
+            modalImg.src = imgSrc;
         });
     </script>
 

@@ -24,12 +24,15 @@
     bottom: 0;
     position: sticky;
     top: 0;
-    transition: margin-left 0.3s ease;  /* Added transition for smooth sliding */
-    margin-left: 0;  /* Sidebar is visible by default on larger screens */
+    transition: margin-left 0.3s ease;
+    /* Added transition for smooth sliding */
+    margin-left: 0;
+    /* Sidebar is visible by default on larger screens */
 }
 
 #sidebar.active {
-    margin-left: -250px;  /* Hide sidebar off-screen */
+    margin-left: -250px;
+    /* Hide sidebar off-screen */
 }
 
 #sidebar .sidebar-header {
@@ -136,12 +139,16 @@ ul.CTAs a {
     display: none;
 }
 
+#addAlbumButton, #emptystateAddAlbumModal, #emptystate2AddAlbumModal, #uploadImageButton, #uploadImageButtonAlt, #btnUploadImagesModal, #createAlbum, #confirmUploadBtn {
+    background-color: #0b0b14;
+    color: white;
+}
+
 .card {
     width: 100%;
     height: 100%;
     overflow: hidden;
     border-radius: 12px;
-    border: 5px solid gray;
 }
 
 .card-body {
@@ -151,11 +158,13 @@ ul.CTAs a {
 /*RESPONSIVENESS*/
 @media (max-width: 768px) {
     #sidebar {
-        margin-left: -250px;  /* Sidebar is hidden by default on mobile */
+        margin-left: -250px;
+        /* Sidebar is hidden by default on mobile */
     }
 
     #sidebar.active {
-        margin-left: 0;  /* Sidebar becomes visible when active */
+        margin-left: 0;
+        /* Sidebar becomes visible when active */
     }
 
     .wrapper.active {
